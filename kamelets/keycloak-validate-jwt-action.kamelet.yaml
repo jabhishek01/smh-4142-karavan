@@ -1,0 +1,284 @@
+apiVersion: camel.apache.org/v1
+kind: Kamelet
+metadata:
+  name: keycloak-validate-jwt-action
+  annotations:
+    camel.apache.org/kamelet.support.level: Stable
+    camel.apache.org/catalog.version: 4.6.0
+    camel.apache.org/kamelet.icon: >-
+      data:image/png;base64,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
+    camel.apache.org/provider: Example
+    camel.apache.org/kamelet.group: Authentication
+  labels:
+    camel.apache.org/kamelet.type: action
+spec:
+  definition:
+    title: Keycloak JWT Validator
+    description: >
+      Validates a JWT token provided in the Authorization header using
+      Keycloak's token introspection API. It checks for token validity and
+      verifies that the token's claims match expected values.
+    required:
+      - clientId
+      - clientSecret
+      - realm
+      - keycloakHost
+      - expectedIssuer
+      - expectedAudience
+    type: object
+    properties:
+      clientId:
+        type: string
+        title: Client ID
+        description: The client ID registered with Keycloak.
+      clientSecret:
+        type: string
+        title: Client Secret
+        description: The client secret for the client ID.
+      realm:
+        type: string
+        title: Keycloak Realm
+        description: The realm in Keycloak to authenticate against.
+      keycloakHost:
+        type: string
+        title: Keycloak Host
+        description: >-
+          The base URL of your Keycloak server
+          (e.g.,https://keycloak.example.com).
+      expectedIssuer:
+        type: string
+        title: Expected Issuer
+        description: The expected issuer (iss claim) in the token.
+        example: https://keycloak.example.com/realms/your-realm
+      expectedAudience:
+        type: string
+        title: Expected Audience
+        description: The expected audience (aud claim) in the token.
+        example: account
+  dependencies:
+    - camel:core
+    - camel:jsonpath
+    - camel:http
+  template:
+    route:
+      id: route-a79f
+      from:
+        id: from-source
+        uri: kamelet:source
+        steps:
+          - setProperty:
+              id: setProperty-authHeader
+              name: authHeader
+              expression:
+                simple:
+                  id: simple-48d9
+                  expression: ${header.Authorization}
+          - log:
+              id: log-auth-header
+              message: Received Authorization header.
+              loggingLevel: DEBUG
+          - filter:
+              id: filter-check-bearer
+              expression:
+                simple:
+                  id: simple-d9db
+                  expression: >-
+                    ${exchangeProperty.authHeader?.startsWith('Bearer ')} ==
+                    true
+              steps:
+                - setProperty:
+                    id: setProperty-jwtToken
+                    name: jwtToken
+                    expression:
+                      simple:
+                        id: simple-a2b6
+                        expression: >-
+                          ${exchangeProperty.authHeader.substring(7).trim().replaceAll('<','').replaceAll('>','')}
+                - log:
+                    id: log-token-extracted
+                    message: JWT token extracted.
+                    loggingLevel: DEBUG
+                - setHeader:
+                    id: setHeader-http-method
+                    name: Exchange.HTTP_METHOD
+                    expression:
+                      constant:
+                        id: constant-5564
+                        expression: POST
+                - setHeader:
+                    id: setHeader-content-type
+                    name: Exchange.CONTENT_TYPE
+                    expression:
+                      constant:
+                        id: constant-781f
+                        expression: application/x-www-form-urlencoded
+                - setHeader:
+                    id: setHeader-http-path
+                    name: Exchange.HTTP_PATH
+                    expression:
+                      constant:
+                        id: constant-af3e
+                        expression: /
+                - setBody:
+                    id: setBody-introspection-request
+                    expression:
+                      simple:
+                        id: simple-14cd
+                        expression: >-
+                          token=${exchangeProperty.jwtToken}&client_id={{clientId}}&client_secret={{clientSecret}}
+                - log:
+                    id: log-introspection-request
+                    message: Sending token introspection request.
+                    loggingLevel: DEBUG
+                - to:
+                    id: to-introspection-api
+                    uri: http
+                    parameters:
+                      bridgeEndpoint: "true"
+                      throwExceptionOnFailure: "false"
+                      httpUri: >-
+                        {{keycloakHost}}/realms/{{realm}}/protocol/openid-connect/token/introspect
+                - log:
+                    id: log-raw-response
+                    message: "Received introspection response : ${body}"
+                    loggingLevel: DEBUG
+                - unmarshal:
+                    id: unmarshal-json
+                    json:
+                      id: json-c98e
+                - setProperty:
+                    id: setProperty-tokenActive
+                    name: tokenActive
+                    expression:
+                      simple:
+                        id: simple-62e5
+                        expression: ${body[active]}
+                - setProperty:
+                    id: setProperty-tokenIssuer
+                    name: tokenIssuer
+                    expression:
+                      simple:
+                        id: simple-c059
+                        expression: ${body[iss]}
+                - setProperty:
+                    id: setProperty-tokenAudience
+                    name: tokenAudience
+                    expression:
+                      simple:
+                        id: simple-2279
+                        expression: ${body[aud]}
+                - setProperty:
+                    id: setProperty-tokenClientId
+                    name: tokenClientId
+                    expression:
+                      simple:
+                        id: simple-cd21
+                        expression: ${body[client_id]}
+                - filter:
+                    id: filter-check-active
+                    expression:
+                      simple:
+                        id: simple-11e8
+                        expression: ${exchangeProperty.tokenActive} == true
+                    steps:
+                      - filter:
+                          id: filter-validate-claims
+                          expression:
+                            simple:
+                              id: simple-8c30
+                              expression: >-
+                                "${exchangeProperty.tokenIssuer} ==
+                                '{{expectedIssuer}}' &&
+                                ${exchangeProperty.tokenAudience} ==
+                                '{{expectedAudience}}' &&
+                                ${exchangeProperty.tokenClientId} ==
+                                '{{clientId}}'"
+                          steps:
+                            - setBody:
+                                id: setBody-authorized
+                                expression:
+                                  constant:
+                                    id: constant-5e22
+                                    expression: AUTHORIZED
+                            - log:
+                                id: log-authorized
+                                message: Token is active and claims are valid.
+                                loggingLevel: INFO
+                      - filter:
+                          id: filter-invalid-claims
+                          expression:
+                            simple:
+                              id: simple-ceba
+                              expression: ${body} != 'AUTHORIZED'
+                          steps:
+                            - setBody:
+                                id: setBody-invalid-claims
+                                expression:
+                                  constant:
+                                    id: constant-b18f
+                                    expression: UNAUTHORIZED
+                            - setHeader:
+                                id: setHeader-invalid-claims
+                                name: CamelHttpResponseCode
+                                expression:
+                                  constant:
+                                    id: constant-330e
+                                    expression: "403"
+                            - log:
+                                id: log-invalid-claims
+                                message: Token claims are invalid.
+                                loggingLevel: WARN
+                            - stop:
+                                id: stop-825a
+                - filter:
+                    id: filter-token-inactive
+                    expression:
+                      simple:
+                        id: simple-b968
+                        expression: ${exchangeProperty.tokenActive} != true
+                    steps:
+                      - setBody:
+                          id: setBody-unauthorized
+                          expression:
+                            constant:
+                              id: constant-b36f
+                              expression: UNAUTHORIZED
+                      - setHeader:
+                          id: setHeader-unauthorized
+                          name: CamelHttpResponseCode
+                          expression:
+                            constant:
+                              id: constant-17ee
+                              expression: "403"
+                      - log:
+                          id: log-token-inactive
+                          message: Token is inactive or invalid.
+                          loggingLevel: WARN
+                      - stop:
+                          id: stop-c817
+          - filter:
+              id: filter-invalid-header
+              expression:
+                simple:
+                  id: simple-98b1
+                  expression: ${body} != 'AUTHORIZED'
+              steps:
+                - setBody:
+                    id: setBody-invalid-header
+                    expression:
+                      constant:
+                        id: constant-a254
+                        expression: UNAUTHORIZED
+                - setHeader:
+                    id: setHeader-invalid-header
+                    name: CamelHttpResponseCode
+                    expression:
+                      constant:
+                        id: constant-c0a8
+                        expression: "403"
+                - log:
+                    id: log-invalid-header
+                    message: Invalid or missing Authorization header.
+                    loggingLevel: WARN
+                - stop:
+                    id: stop-e00e

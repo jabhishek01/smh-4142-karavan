@@ -1,0 +1,105 @@
+apiVersion: camel.apache.org/v1
+kind: Kamelet
+metadata:
+  name: alert-service-action
+  annotations:
+    camel.apache.org/kamelet.support.level: Preview
+    camel.apache.org/catalog.version: "1"
+    camel.apache.org/kamelet.icon: >-
+      data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
+      fill='%23000000' viewBox='0 0 32 32'
+      id='icon'%3E%3Cdefs%3E%3Cstyle%3E.cls-1%7Bfill:none;%7D%3C/style%3E%3C/defs%3E%3Ctitle%3Eapplication%3C/title%3E%3Cpath
+      d='M16,18H6a2,2,0,0,1-2-2V6A2,2,0,0,1,6,4H16a2,2,0,0,1,2,2V16A2,2,0,0,1,16,18ZM6,6V16H16V6Z'
+      transform='translate(0 0)'/%3E%3Cpath
+      d='M26,12v4H22V12h4m0-2H22a2,2,0,0,0-2,2v4a2,2,0,0,0,2,2h4a2,2,0,0,0,2-2V12a2,2,0,0,0-2-2Z'
+      transform='translate(0 0)'/%3E%3Cpath
+      d='M26,22v4H22V22h4m0-2H22a2,2,0,0,0-2,2v4a2,2,0,0,0,2,2h4a2,2,0,0,0,2-2V22a2,2,0,0,0-2-2Z'
+      transform='translate(0 0)'/%3E%3Cpath
+      d='M16,22v4H12V22h4m0-2H12a2,2,0,0,0-2,2v4a2,2,0,0,0,2,2h4a2,2,0,0,0,2-2V22a2,2,0,0,0-2-2Z'
+      transform='translate(0 0)'/%3E%3Cg id='_Transparent_Rectangle_'
+      data-name='&lt;Transparent Rectangle&gt;'%3E%3Crect class='cls-1'
+      width='32' height='32'/%3E%3C/g%3E%3C/svg%3E
+    camel.apache.org/provider: Cimetrix
+    camel.apache.org/kamelet.group: Alert
+    camel.apache.org/kamelet.namespace: Alert
+  labels:
+    camel.apache.org/kamelet.type: action
+spec:
+  definition:
+    title: Alert Service
+    description: Sends alerts to the business alerts API
+    required:
+      - type
+      - severity
+      - message
+    properties:
+      type:
+        title: Alert Type
+        description: Type of the alert
+        type: string
+        example: Invalid Lot
+      severity:
+        title: Severity
+        description: Severity level of the alert
+        type: string
+        enum:
+          - CRITICAL
+          - HIGH
+          - MEDIUM
+          - LOW
+        example: CRITICAL
+        default: ""
+      message:
+        title: Message
+        description: Detailed message
+        type: string
+        example: Lot 5948 was not found
+        default: ""
+  types:
+    in:
+      mediaType: application/json
+    out:
+      mediaType: application/json
+  template:
+    route:
+      id: route-ac02
+      from:
+        id: from-3d00
+        uri: kamelet:source
+        parameters:
+          name: alert-sender
+        steps:
+          - setBody:
+              id: setBody-e409
+              expression:
+                simple:
+                  id: simple-a2f0
+                  expression: |
+                    {
+                      "sourceSystem": "{{camel.karavan.project-id}}",
+                      "severity": "{{severity}}",
+                      "type": "{{type}}",
+                      "message": "{{message}}",
+                      "eventTime": "${date:now:yyyy-MM-dd'T'HH:mm:ss.SSSZ}",
+                      "tags": {
+                        "exchangeId": "${exchangeId}",
+                        "messageId": "${exchange.getMessage().getMessageId()}"
+                       }
+                    }
+          - setHeader:
+              id: setHeader-cdf5
+              name: Content-Type
+              expression:
+                constant:
+                  id: constant-62de
+                  expression: application/json
+          - to:
+              id: to-8268
+              uri: http
+              parameters:
+                contentType: application/json
+                bridgeEndpoint: "true"
+                throwExceptionOnFailure: "false"
+                httpMethod: POST
+                httpUri: >-
+                  {{alter.service.url}}/alerts
