@@ -1,0 +1,11 @@
+services:
+  test12345:
+    image: test12345
+    cpu_percent: 10
+    mem_limit: 1024M
+    mem_reservation: 512M
+    restart: always
+    ports:
+      - "9092:8080"
+    networks:
+      - karavan
